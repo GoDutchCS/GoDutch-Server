@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/GoDutchCS496/GoDutch-Server/issues"
   },
-  "homepage": "https://github.com/GoDutchCS496/GoDutch-Server#readme"
+  "homepage": "https://github.com/GoDutchCS496/GoDutch-Server#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
