@@ -16,6 +16,7 @@
     "url": "https://github.com/GoDutchCS496/GoDutch-Server/issues"
   },
   "homepage": "https://github.com/GoDutchCS496/GoDutch-Server#readme",
+  "type": "module",
   "dependencies": {
     "express": "^4.17.1",
     "mongoose": "^5.9.24"
