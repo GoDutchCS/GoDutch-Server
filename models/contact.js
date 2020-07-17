@@ -1,9 +1,12 @@
 import mongoose from 'mongoose'
 
 const contactSchema = mongoose.Schema({
-    name: String,
-    number: String,
-    email: String
+    id: String,
+    contacts: [{
+        name: String,
+        number: String,
+        email: String
+    }]
 }, {
     collection: 'contacts'
 })
