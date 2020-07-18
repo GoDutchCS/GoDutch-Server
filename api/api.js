@@ -7,9 +7,25 @@ router.post('/contacts/insert', async (req, res) => {
 
     if (exists) {
         try {
-            await Contact.update(
+            await Contact.updateOne(
                 { id: req.body.id },
-                { $push: { contacts: req.body.contacts } }
+                [{
+                    $addFields: {
+                        contacts: {
+                            $reduce: {
+                                input: req.body.contacts,
+                                initialValue: '$contacts',
+                                in: {
+                                    $cond: [
+                                        { $in: [ '$$this.number', '$contacts.number' ] },
+                                        '$$value',
+                                        { $concatArrays: [ [ '$$this' ], '$$value' ] }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }]
             )
         } catch (err) {
             res.status(500).send(err)
