@@ -62,4 +62,26 @@ router.get('/list/:id', async (req, res) => {
     res.json({ photos })
 })
 
+router.post('/delete', async (req, res) => {
+    const { id, photos } = req.body
+
+    try {
+        await Photo.updateOne(
+            { id },
+            {
+                $pull: {
+                    photos: { $in: photos }
+                }
+            }
+        )
+        photos.forEach(path => { fs.unlinkSync(path) })
+    } catch (err) {
+        return res.status(500).send(err);
+    }
+
+    const doc = await Photo.findOne({ id })
+    const photoPaths = doc.photos.map(path => path.startsWith('/tmp') ? path.substring(4) : path)
+    res.json({ success: true, photos: photoPaths })
+})
+
 export default router
