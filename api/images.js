@@ -23,11 +23,7 @@ const upload = multer({ storage })
 
 router.post('/upload', upload.array('photos'), async (req, res) => {
     const { id } = req.body
-    console.log(req.body)
-    console.log(req.files)
-
     const filenames = req.files.map(e => e.path)
-
     const exists = await Photo.exists({ id })
 
     if (exists) {
@@ -57,6 +53,13 @@ router.post('/upload', upload.array('photos'), async (req, res) => {
     }
 
     res.json({ success: true })
+})
+
+router.get('/list/:id', async (req, res) => {
+    const { id } = req.params
+    const docs = await Photo.findOne({ id })
+    const photos = docs.photos.map(path => path.startsWith('/tmp') ? path.substring(4) : path)
+    res.json({ photos })
 })
 
 export default router
