@@ -31,7 +31,7 @@ router.post('/contacts/insert', async (req, res) => {
                 }]
             )
         } catch (err) {
-            res.status(500).send(err)
+            return res.status(500).send(err)
         }
         res.json({ success: true })
     } else {
@@ -39,7 +39,7 @@ router.post('/contacts/insert', async (req, res) => {
         try {
             await newContact.save()
         } catch (err) {
-            res.status(500).send(err)
+            return res.status(500).send(err)
         }
         res.json({ success: true })
     }

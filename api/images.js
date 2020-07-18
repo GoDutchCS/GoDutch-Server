@@ -48,7 +48,7 @@ router.post('/upload', upload.array('photos'), async (req, res) => {
         try {
             await newGallery.save()
         } catch (err) {
-            res.status(500).send(err)
+            return res.status(500).send(err)
         }
     }
 
