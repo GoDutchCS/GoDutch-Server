@@ -1,9 +1,11 @@
 import express from 'express'
 import imagesRouter from './images.js'
+import usersRouter from './users.js'
 import Contact from '../models/contact.js'
 const router = express.Router()
 
 router.use('/images', imagesRouter)
+router.use('/users', usersRouter)
 
 router.post('/contacts/insert', async (req, res) => {
     const exists = await Contact.exists({ id: req.body.id })
