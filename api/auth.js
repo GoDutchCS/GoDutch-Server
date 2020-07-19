@@ -22,10 +22,7 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/register', async (req, res) => {
-    const { account_number } = req.body
-
     const newUser = new User(req.body)
-
     try {
         const result = await newUser.save()
         console.log(result)
