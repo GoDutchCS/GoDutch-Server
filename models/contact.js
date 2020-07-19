@@ -1,7 +1,10 @@
 import mongoose from 'mongoose'
 
 const contactSchema = mongoose.Schema({
-    id: String,
+    id: {
+        type: String,
+        required: true
+    },
     contacts: [{
         name: String,
         number: String,
