@@ -34,7 +34,7 @@ const partySchema = mongoose.Schema({
         type: [
             Transaction
         ],
-        required: true
+        required: false
     }
 }, {
     collection: 'parties'
