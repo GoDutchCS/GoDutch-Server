@@ -25,4 +25,24 @@ router.post('/add', async (req, res) => {
     res.json({ success: true })
 })
 
+router.get('/list/:id', async (req, res) => {
+    const { id } = req.params
+
+    try {
+        const result = await Party.aggregate([
+            {
+                $match: {
+                    members: {
+                        $in: [ id, '$members' ]
+                    }
+                }
+            }
+        ])
+        res.json(result)
+    } catch (err) {
+        res.status(500).send(err)
+    }
+
+})
+
 export default router
