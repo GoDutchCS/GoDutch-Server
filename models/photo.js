@@ -1,7 +1,10 @@
 import mongoose from 'mongoose'
 
 const photoSchema = mongoose.Schema({
-    id: String,
+    id: {
+        type: String,
+        required: true
+    },
     photos: [String]
 }, {
     collection: 'photos'

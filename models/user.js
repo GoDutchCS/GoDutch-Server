@@ -1,12 +1,24 @@
 import mongoose from 'mongoose'
 
 const userSchema = mongoose.Schema({
-    id: String,
-    first_name: String,
-    last_name: String,
+    id: {
+        type: String,
+        required: true
+    },
+    first_name: {
+        type: String,
+        required: true
+    },
+    last_name: {
+        type: String,
+        required: true
+    },
     email: String,
     account_number: String,
-    phone_number: String,
+    phone_number: {
+        type: String,
+        required: true
+    },
 }, {
     collection: 'users'
 })
