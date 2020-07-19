@@ -1,5 +1,6 @@
 import express from 'express'
 import mongoose from 'mongoose'
+import morgan from 'morgan'
 import http from 'http'
 import { api, auth } from './api/index.js'
 
@@ -13,6 +14,8 @@ mongoose.connect('mongodb://localhost/godutch', { useNewUrlParser: true, useFind
 app.set('port', process.env.PORT || 3000)
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+app.use(morgan('combined'))
+
 app.get('/', (req, res) => { res.json({}) })
 app.use('/api', api)
 app.use('/auth', auth)
