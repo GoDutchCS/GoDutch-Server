@@ -1,8 +1,20 @@
 import mongoose from 'mongoose'
 
 const Transaction = {
+    title: {
+        type: String,
+        required: true
+    },
+    date: { // yyyy-MM-dd format
+        type: String,
+        required: true
+    },
     participants: {
-        type: [String] ,
+        type: [String],
+        required: true
+    },
+    total: {
+        type: Number,
         required: true
     },
     cashflow: {
