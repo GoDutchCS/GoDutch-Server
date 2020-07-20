@@ -96,11 +96,12 @@ router.post('/:id/transactions/add', async (req, res) => {
 
     console.log(req.body)
     if (method === 'N-Bread') {
-        const cashflow = participants.map(participant => ({
+        const cashflow = participants.map((participant, idx) => ({
             from: participant,
             to: buyer,
             amount: total / (1 + participants.length),
-            completed: false
+            completed: false,
+            id: idx
         }))
 
         const newTransaction = { title, date, buyer, participants, total, cashflow }

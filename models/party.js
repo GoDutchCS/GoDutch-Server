@@ -22,6 +22,10 @@ const Transaction = {
         required: true
     },
     cashflow: [{
+        id: {
+            type: Number,
+            required: true
+        },
         from: {
             type: String,
             required: true
