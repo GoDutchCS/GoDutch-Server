@@ -44,6 +44,7 @@ router.get('/list/:id', async (req, res) => {
     }
 })
 
+// endpoint to retrieve transactions grouped by date
 router.get('/transactions/:id', async (req, res) => {
     const { id } = req.params
     try {
@@ -57,14 +58,22 @@ router.get('/transactions/:id', async (req, res) => {
             {
                 $project: {
                     title: '$transactions.title',
-                    date: '$transactions.date'
+                    date: '$transactions.date',
+                    total: '$transactions.total',
+                    buyer: '$transactions.buyer',
+                    cashflow: '$transactions.cashflow'
                 }
             },
             {
                 $group: {
                     _id: '$date',
-                    titles: {
-                        $push: '$title'
+                    transactions: {
+                        $push: {
+                            title: '$title',
+                            buyer: '$buyer',
+                            cashflow: '$cashflow',
+                            total: '$total'
+                        }
                     }
                 }
             },
@@ -77,6 +86,35 @@ router.get('/transactions/:id', async (req, res) => {
         res.json(result)
     } catch (err) {
         res.status(500).send(result)
+    }
+})
+
+router.post('/:id/transactions/add', async (req, res) => {
+    const { id } = req.params
+    const { title, buyer, method, participants, total } = req.body
+    const date = new Date().toISOString().substring(0, 10)
+
+    console.log(req.body)
+    if (method === 'N-Bread') {
+        const cashflow = participants.map(participant => ({
+            from: participant,
+            to: buyer,
+            amount: total / (1 + participants.length),
+            completed: false
+        }))
+
+        const newTransaction = { title, date, buyer, participants, total, cashflow }
+        const result = await Party.updateOne(
+            { id },
+            {
+                $push: {
+                    transactions: newTransaction
+                }
+            }
+        )
+        res.json({ success: true })
+    } else {
+        res.status(500).send("Not Supported")
     }
 })
 
