@@ -9,7 +9,11 @@ const Transaction = {
         type: String,
         required: true
     },
-    participants: {
+    buyer: {
+        type: String,
+        required: true
+    },
+    participants: { // does not contain buyer
         type: [String],
         required: true
     },
@@ -17,7 +21,7 @@ const Transaction = {
         type: Number,
         required: true
     },
-    cashflow: {
+    cashflow: [{
         from: {
             type: String,
             required: true
@@ -29,8 +33,12 @@ const Transaction = {
         amount: {
             type: Number,
             required: true
+        },
+        completed: {
+            type: Boolean,
+            required: true
         }
-    }
+    }]
 }
 
 const partySchema = mongoose.Schema({
