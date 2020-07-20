@@ -1,5 +1,6 @@
 import express from 'express'
 import Contact from '../models/contact.js'
+import User from '../models/user.js'
 const router = express.Router()
 
 /*
@@ -47,6 +48,16 @@ router.get('/list/:id', async (req, res) => {
     ])
 
     res.json({ result })
+})
+
+router.get('/single/:id', async (req, res) => {
+    const { id } = req.params
+    try {
+        const doc = await User.findOne({ id })
+        res.json(doc)
+    } catch (err) {
+        res.status(500).send(err)
+    }
 })
 
 export default router
