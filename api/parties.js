@@ -42,7 +42,52 @@ router.get('/list/:id', async (req, res) => {
     } catch (err) {
         res.status(500).send(err)
     }
+})
 
+router.get('/transactions/:id', async (req, res) => {
+    const { id } = req.params
+    try {
+        const result = await Party.aggregate([
+            {
+                $match: { id }
+            },
+            {
+                $unwind: '$transactions'
+            },
+            {
+                $project: {
+                    title: '$transactions.title',
+                    date: '$transactions.date'
+                }
+            },
+            {
+                $group: {
+                    _id: '$date',
+                    titles: {
+                        $push: '$title'
+                    }
+                }
+            },
+            {
+                $sort: {
+                    _id: 1
+                }
+            }
+        ])
+        res.json(result)
+    } catch (err) {
+        res.status(500).send(result)
+    }
+})
+
+router.get('/single/:id', async (req, res) => {
+    const { id } = req.params
+    try {
+        const result = await Party.findOne({ id })
+        res.json(result)
+    } catch (err) {
+        res.status(500).send(err)
+    }
 })
 
 export default router
