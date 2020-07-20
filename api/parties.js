@@ -1,6 +1,28 @@
 import express from 'express'
 import Party from '../models/party.js'
+import User from '../models/user.js'
 const router = express.Router()
+
+const initializeGraph = ids =>
+    ids.reduce((acc, cur) => ({
+        ...acc,
+        [cur]: ids.reduce((innerAcc, innerCur) => innerCur !== cur ? ({
+            ...innerAcc,
+            [innerCur]: 0
+        }) : innerAcc, {})
+    }), {})
+
+const getNamesMap = async ids => {
+    const names = await Promise.all(ids.map(async id => {
+        const user = await User.findOne({ id })
+        return `${user.first_name}`
+    }))
+
+    return ids.reduce((acc, cur, idx) => ({
+        ...acc,
+        [cur]: names[idx]
+    }), {})
+}
 
 router.post('/add', async (req, res) => {
     let { id, members } = req.body
@@ -127,6 +149,57 @@ router.get('/single/:id', async (req, res) => {
     } catch (err) {
         res.status(500).send(err)
     }
+})
+
+router.get('/:id/resolve', async (req, res) => {
+    const { id } = req.params
+    const { members } = await Party.findOne({ id })
+    const graph = initializeGraph(members)
+    const namesMap = await getNamesMap(members)
+    const cashFlows = await Party.aggregate([
+        {
+            $match: { id }
+        },
+        {
+            $unwind: '$transactions'
+        },
+        {
+            $project: {
+                date: '$transactions.date',
+                cashflow: '$transactions.cashflow'
+            }
+        },
+        {
+            $unwind: '$cashflow'
+        },
+        {
+            $project: {
+                from: '$cashflow.from',
+                to: '$cashflow.to',
+                amount: '$cashflow.amount',
+                cashflowID: '$cashflow.id',
+                date: 1
+            }
+        }
+    ])
+
+    cashFlows.forEach(({ date, from, to, amount }) => {
+        if (amount > graph[to][from]) {
+            graph[from][to] += (amount - graph[to][from]);
+            graph[to][from] = 0;
+        } else
+            graph[to][from] -= amount;
+    })
+
+    const result = Object.keys(graph).reduce(
+        (acc, cur) => {
+            const filtered = Object.keys(graph[cur]).reduce((innerAcc, innerCur) => graph[cur][innerCur] === 0 ? innerAcc : ({...innerAcc, [innerCur]: graph[cur][innerCur]}),{})
+            return Object.keys(filtered).length === 0 ? acc : ({ ...acc, [cur]:  filtered})
+        },
+        {}
+    )
+
+    res.json({ result, namesMap })
 })
 
 export default router
