@@ -60,4 +60,16 @@ router.get('/single/:id', async (req, res) => {
     }
 })
 
+router.get('/multiple', async (req, res) => {
+    console.log(req.query)
+    const { users } = req.query
+
+    try {
+        const result = await User.find({ id: { $in: users } })
+        res.json(result)
+    } catch (err) {
+        res.status(500).send(err)
+    }
+})
+
 export default router
