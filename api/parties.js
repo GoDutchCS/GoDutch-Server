@@ -91,12 +91,12 @@ router.get('/transactions/:id', async (req, res) => {
 })
 
 router.post('/transactions/complete', async (req, res) => {
-    const { party_id, title, cashflow_id } = req.body
+    const { party_id, user_id, to } = req.body
     try {
-        const result = await Party.update(
+        const result = await Party.updateMany(
             { id: party_id },
             { $set: { 'transactions.$[outer].cashflow.$[inner].completed': true } },
-            { arrayFilters: [{ 'outer.title': title }, { 'inner.id': cashflow_id }] }
+            { arrayFilters: [{ 'outer.date': { $gt: '1970-01-01T00:00:00' } }, { 'inner.from': { $in: [ user_id, to ] }, 'inner.to': { $in: [ user_id, to ] } }] }
         )
         res.json({ success: true })
     } catch (err) {
