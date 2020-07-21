@@ -142,8 +142,9 @@ router.post('/:id/transactions/add', async (req, res) => {
 router.get('/single/:id', async (req, res) => {
     const { id } = req.params
     try {
-        const result = await Party.findOne({ id })
-        res.json(result)
+        const { members } = await Party.findOne({ id })
+        const namesMap = await getNamesMap(members)
+        res.json({ members, namesMap })
     } catch (err) {
         res.status(500).send(err)
     }
