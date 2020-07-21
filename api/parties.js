@@ -106,15 +106,19 @@ router.post('/transactions/complete', async (req, res) => {
 
 router.post('/:id/transactions/add', async (req, res) => {
     const { id } = req.params
-    const { title, buyer, method, participants, total } = req.body
+    let { title, buyer, method, participants, total } = req.body
     const date = new Date().toISOString().substring(0, 19)
 
-    console.log(req.body)
     if (method === 'N-Bread') {
+        if (participants.includes(buyer))
+            participants = participants.filter(p => p !== buyer)
+        else
+            return res.status(400).send("Buyer must be contained in participants!")
+
         const cashflow = participants.map((participant, idx) => ({
             from: participant,
             to: buyer,
-            amount: total / (1 + participants.length),
+            amount: total / (participants.length + 1),
             completed: false,
             id: idx
         }))
