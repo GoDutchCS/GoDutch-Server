@@ -14,7 +14,14 @@ const userSchema = mongoose.Schema({
         required: true
     },
     email: String,
-    account_number: String,
+    account_number: {
+        type: String,
+        required: true
+    },
+    bank_type: {
+        type: String,
+        required: true
+    },
     phone_number: {
         type: String,
         required: true
