@@ -81,7 +81,8 @@ router.get('/transactions/:id', async (req, res) => {
                 time: { $first: '$time' },
                 cashflow: { $push: '$cashflow' }
             } },
-            { $group: { _id: '$date', transactions: { $push: { title: '$title', buyer: '$buyer', cashflow: '$cashflow', total: '$total', time: '$time' } } } }
+            { $sort: { time: 1 } },
+            { $group: { _id: '$date', transactions: { $push: { title: '$title', buyer: '$buyer', cashflow: '$cashflow', total: '$total', time: '$time' } } } },
         ])
 
         res.json(result)
