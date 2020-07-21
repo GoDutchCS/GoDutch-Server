@@ -171,11 +171,17 @@ router.get('/:id/resolve', async (req, res) => {
         },
         {
             $project: {
+                date: 1,
                 from: '$cashflow.from',
                 to: '$cashflow.to',
                 amount: '$cashflow.amount',
-                cashflowID: '$cashflow.id',
-                date: 1
+                completed: '$cashflow.completed',
+                cashflowID: '$cashflow.id'
+            }
+        },
+        {
+            $match: {
+                completed: false
             }
         }
     ])
