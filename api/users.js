@@ -80,16 +80,45 @@ router.get('/multiple', async (req, res) => {
 router.get('/peopleiowe/:id', async (req, res) => {
     const { id } = req.params
     try {
-        const result = await Party.aggregate([
+        const relatedTransactions = await Party.aggregate([
             { $match: { $expr: { $in: [ id, '$members' ] } } },
             { $unwind: '$transactions' },
-            { $project: { id: 1, participants: '$transactions.participants', title: '$transactions.title', date: '$transactions.date', cashflow: '$transactions.cashflow' } },
-            { $match: { $expr: { $in: [ id, '$participants' ] } }},
+            { $project: { date: '$transactions.date', id: '$id', title: '$transactions.title', cashflow: '$transactions.cashflow'} },
             { $unwind: '$cashflow' },
-            { $project: { id: 1, title: 1, date: 1, from: '$cashflow.from', to: '$cashflow.to', amount: '$cashflow.amount', completed: '$cashflow.completed', cashflow_id: '$cashflow.id' } },
-            { $match: { from: id, completed: false } },
-            { $sort: { date: -1 } }
+            { $project: { date: 1, id: 1, title: 1, from: '$cashflow.from', to: '$cashflow.to', amount: '$cashflow.amount', completed: '$cashflow.completed', cashflow_id: '$cashflow.id' } },
+            { $match: { completed: false, $or: [{ from: id }, { to: id }] } },
+            { $group: { _id: '$id', id: { $first: '$id' }, transactions: { $push: { date: '$date', title: '$title', from: '$from', to: '$to', amount: '$amount', completed: '$completed', cashflow_id: '$cashflow_id' } } } }
         ])
+
+        const result = relatedTransactions.reduce((acc, rt) => {
+            const { transactions } = rt;
+            const partyID = rt.id
+            const dict = {}
+
+            transactions.forEach(tr => {
+                if (id === tr.from) {
+                    if (tr.to in dict)
+                        dict[tr.to] += tr.amount
+                    else
+                        dict[tr.to] = tr.amount
+                } else {
+                    if (tr.from in dict)
+                        dict[tr.from] -= tr.amount
+                    else
+                        dict[tr.from] = -tr.amount
+                }
+            })
+
+            const partyResult = Object.keys(dict).reduce((innerAcc, innerCur) =>
+                dict[innerCur] < 0 ?
+                    innerAcc :
+                    ([ ...innerAcc, { id: partyID, to: innerCur, amount: dict[innerCur] } ]), [])
+            if (partyResult.length === 0)
+                return acc
+            else
+                return [ ...acc, ...partyResult ]
+        }, [])
+
         const namesMap = await getNamesMapAll()
         res.json({ namesMap, result })
     } catch (err) {
