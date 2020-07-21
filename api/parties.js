@@ -1,6 +1,6 @@
 import express from 'express'
 import Party from '../models/party.js'
-import User from '../models/user.js'
+import { getNamesMap } from '../utils/utils.js'
 const router = express.Router()
 
 const initializeGraph = ids =>
@@ -12,17 +12,6 @@ const initializeGraph = ids =>
         }) : innerAcc, {})
     }), {})
 
-const getNamesMap = async ids => {
-    const names = await Promise.all(ids.map(async id => {
-        const user = await User.findOne({ id })
-        return `${user.first_name}`
-    }))
-
-    return ids.reduce((acc, cur, idx) => ({
-        ...acc,
-        [cur]: names[idx]
-    }), {})
-}
 
 router.post('/add', async (req, res) => {
     let { id, members } = req.body
