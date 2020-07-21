@@ -60,43 +60,47 @@ router.get('/transactions/:id', async (req, res) => {
     const { id } = req.params
     try {
         const result = await Party.aggregate([
-            {
-                $match: { id }
-            },
-            {
-                $unwind: '$transactions'
-            },
-            {
-                $project: {
+            { $match: { id } },
+            { $unwind: '$transactions' },
+            { $project: {
                     title: '$transactions.title',
-                    date: '$transactions.date',
+                    date: { $substrBytes: ['$transactions.date', 0, 10] },
+                    time: { $substrBytes: [ '$transactions.date', 11, 16 ] },
                     total: '$transactions.total',
                     buyer: '$transactions.buyer',
                     cashflow: '$transactions.cashflow'
-                }
-            },
-            {
-                $group: {
-                    _id: '$date',
-                    transactions: {
-                        $push: {
-                            title: '$title',
-                            buyer: '$buyer',
-                            cashflow: '$cashflow',
-                            total: '$total'
-                        }
-                    }
-                }
-            },
-            {
-                $sort: {
-                    _id: 1
-                }
-            }
+            } },
+            { $unwind: '$cashflow' },
+            { $match: { 'cashflow.completed': false } },
+            { $group: {
+                _id: '$title',
+                title: { $first: '$title' },
+                date: { $first: '$date' },
+                total: { $first: '$total' },
+                buyer: { $first: '$buyer' },
+                time: { $first: '$time' },
+                cashflow: { $push: '$cashflow' }
+            } },
+            { $group: { _id: '$date', transactions: { $push: { title: '$title', buyer: '$buyer', cashflow: '$cashflow', total: '$total', time: '$time' } } } }
         ])
+
         res.json(result)
     } catch (err) {
         res.status(500).send(result)
+    }
+})
+
+router.post('/transactions/complete', async (req, res) => {
+    const { party_id, title, cashflow_id } = req.body
+    try {
+        const result = await Party.update(
+            { id: party_id },
+            { $set: { 'transactions.$[outer].cashflow.$[inner].completed': true } },
+            { arrayFilters: [{ 'outer.title': title }, { 'inner.id': cashflow_id }] }
+        )
+        res.json({ success: true })
+    } catch (err) {
+        res.status(500).send(err)
     }
 })
 
