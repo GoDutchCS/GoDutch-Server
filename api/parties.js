@@ -103,7 +103,7 @@ router.get('/transactions/:id', async (req, res) => {
 router.post('/:id/transactions/add', async (req, res) => {
     const { id } = req.params
     const { title, buyer, method, participants, total } = req.body
-    const date = new Date().toISOString().substring(0, 10)
+    const date = new Date().toISOString().substring(0, 19)
 
     console.log(req.body)
     if (method === 'N-Bread') {
