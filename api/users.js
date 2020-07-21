@@ -87,7 +87,7 @@ router.get('/peopleiowe/:id', async (req, res) => {
             { $match: { $expr: { $in: [ id, '$participants' ] } }},
             { $unwind: '$cashflow' },
             { $project: { id: 1, title: 1, date: 1, from: '$cashflow.from', to: '$cashflow.to', amount: '$cashflow.amount', completed: '$cashflow.completed', cashflow_id: '$cashflow.id' } },
-            { $match: { from: id } },
+            { $match: { from: id, completed: false } },
             { $sort: { date: -1 } }
         ])
         const namesMap = await getNamesMapAll()
