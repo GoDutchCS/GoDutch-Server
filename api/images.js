@@ -57,9 +57,13 @@ router.post('/upload', upload.array('photos'), async (req, res) => {
 
 router.get('/list/:id', async (req, res) => {
     const { id } = req.params
-    const docs = await Photo.findOne({ id })
-    const photos = docs.photos.map(path => path.startsWith('/tmp') ? path.substring(4) : path)
-    res.json({ photos })
+    try {
+        const docs = await Photo.findOne({ id })
+        const photos = docs.photos.map(path => path.startsWith('/tmp') ? path.substring(4) : path)
+        res.json({ photos })
+    } catch (err) {
+        res.json({ photos: [] })
+    }
 })
 
 router.post('/delete', async (req, res) => {
