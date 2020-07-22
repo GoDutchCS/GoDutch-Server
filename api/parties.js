@@ -107,7 +107,10 @@ router.post('/transactions/complete', async (req, res) => {
 router.post('/:id/transactions/add', async (req, res) => {
     const { id } = req.params
     let { title, buyer, method, participants, total } = req.body
-    const date = new Date().toISOString().substring(0, 19)
+
+    let localDate = new Date();
+    localDate.setHours(localDate.getHours() + 9)
+    const date = localDate.toISOString().substring(0, 19)
 
     if (method === 'N-Bread') {
         if (participants.includes(buyer))
