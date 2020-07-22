@@ -71,7 +71,6 @@ router.get('/transactions/:id', async (req, res) => {
                     cashflow: '$transactions.cashflow'
             } },
             { $unwind: '$cashflow' },
-            { $match: { 'cashflow.completed': false } },
             { $group: {
                 _id: '$title',
                 title: { $first: '$title' },
