@@ -28,7 +28,7 @@ Below is a list of endpoints that a user can send requests to:
     * `{ success: true }` if successful
     * error message with status `500` otherwise
 
-### Images
+### Images `/api/images`
 * *GET* `/api/images/list/:id`: get a list of paths to a user's gallery
     params:
     * `id`: identification string of user
@@ -49,7 +49,7 @@ Below is a list of endpoints that a user can send requests to:
     * `{ success: true, photos: <paths_to_photos> }` if successful
     * error message with status `500` otherwise
 
-### Parties
+### Parties `/api/parties`
 * *GET* `/api/parties/list/:id`: retrieve a list of parties that a specific user is included in
     params:
     * `id`: identification string of user
@@ -95,7 +95,7 @@ Below is a list of endpoints that a user can send requests to:
     * `{ successful: true }` if successful
     * error message with status `500` otherwise
 
-### Users
+### Users `/api/users`
 * *GET* `/api/users/list/:id`: retrieve the information of people that are members of GoDutch among the contacts of user with `id`
     params:
     * `id`: identification string of user
